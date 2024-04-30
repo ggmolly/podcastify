@@ -1,0 +1,45 @@
+<section
+    class="flex justify-center items-center h-screen"
+>
+    <article class="block">
+        <h1 class="text-center">podcastify</h1>
+        <div class="my-2"></div>
+        <h3 class="text-center">turn any youtube video into a podcast</h3>
+        <form
+            hx-post="/api/v1/podcastify"
+            _="on submit
+                remove .hidden from #slow then
+                add .flex to #slow then
+                toggle @disabled until htmx:afterOnLoad then
+                add .hidden to #slow
+                on htmx:afterOnLoad if detail.xhr.status != 200 then
+                    call alert(detail.xhr.responseText)
+            "
+        >
+            <div class="border-2 p-2 m-2 border-base-200 max-w-screen-sm">
+                <h5>remove these annoyances:</h5>
+                <div class="flex flex-wrap gap-2 justify-around">
+                    {{range .Annoyances}}
+                        {{template "partials/smart_checkbox" .}}
+                    {{end}}
+                </div>
+                <hr>
+                <div class="flex justify-around my-1">
+                    <span class="text-sm">data provided by <a href="https://sponsor.ajay.app/" class="link link-accent">sponsorblock</a></span>
+                    <span class="text-content text-sm"></span>
+                    <span class="text-error text-sm">! might not be 100% accurate !</span></span>
+                </div>
+            </div>
+            <div class="hidden justify-center gap-x-2 my-2" id="slow">
+                <span class="text-sm">
+                    converting the video might take a while, please be patient
+                </span>
+                <span class="loading loading-spinner"></span>
+            </div>
+            <div class="join w-full">
+                <input type="text" name="url" class="input input-primary input-bordered join-item w-full" placeholder="a youtube url" required aria-label="YouTube URL">
+                <button class="btn btn-primary join-item">convert</button>
+            </div>
+        </form>
+    </article>
+</section>
