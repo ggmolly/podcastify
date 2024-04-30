@@ -31,6 +31,7 @@ please wait a bit, i'm working on it; follow the instructions below to deploy yo
 4. run `podcastify` and you have your own
 
 | variable | type | description |
+| --- | --- | --- |
 | `PORT` | `int` | port to listen on |
 | `BIND_ADDRESS` | `int` | address to bind to |
 | `MODE` | `development` or `production` | if `production` the templates are not reloaded |
