@@ -19,11 +19,12 @@ import (
 )
 
 var (
-	PATH       = os.Getenv("PODCAST_ROOT_DIR")
-	Validator  = validator.New()
-	ytIdRegex  = regexp.MustCompile("[a-zA-Z0-9_-]{11}")
-	ffmpegLock = sync.Mutex{}
-	MaxLength  = 4 * time.Hour
+	PATH           = os.Getenv("PODCAST_ROOT_DIR")
+	Validator      = validator.New()
+	ytIdRegex      = regexp.MustCompile("[a-zA-Z0-9_-]{11}")
+	ffmpegLock     = sync.Mutex{}
+	MaxLength      = 4 * time.Hour
+	ExpirationTime = 6 * time.Hour
 )
 
 type Podcast struct {
@@ -35,7 +36,7 @@ type Podcast struct {
 	Reminders     bool      `filename:"r" form:"reminders" validate:"omitempty,boolean" arg:"interaction"`
 	Credits       bool      `filename:"c" form:"credits" validate:"omitempty,boolean" arg:"outro"`
 	Recaps        bool      `filename:"r" form:"recaps" validate:"omitempty,boolean" arg:"preview"`
-	UpdatedAt     time.Time `gorm:"autoUpdateTime;index,sort:asc" form:"-" validate:"-"`
+	DeleteAt      time.Time `gorm:"index,sort:asc" form:"-" validate:"-"`
 }
 
 // PodcastFromRequest returns a podcast struct from the request body
@@ -123,9 +124,17 @@ func (p *Podcast) Remove() {
 // Bump updates the UpdatedAt field of the podcast to now
 // this to avoid the podcast from being deleted by the cleanup routine
 func (p *Podcast) Bump() {
-	p.UpdatedAt = time.Now()
+	p.DeleteAt = time.Now().Add(ExpirationTime)
 	if err := GormDB.Save(p).Error; err != nil {
 		log.Println("failed to update podcast: ", err)
+	}
+}
+
+// Saves the podcast to the database
+func (p *Podcast) Save() {
+	p.DeleteAt = time.Now().Add(ExpirationTime)
+	if err := GormDB.Create(p).Error; err != nil {
+		log.Println("failed to save podcast: ", err)
 	}
 }
 
@@ -178,6 +187,7 @@ func (p *Podcast) Download() (string, error) {
 		log.Println("failed to download podcast: ", err)
 		return "", err
 	}
+	p.Save()
 	return output, nil
 }
 

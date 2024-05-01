@@ -22,24 +22,26 @@ import (
 )
 
 var (
-	BindAddress    = "127.0.0.1"
-	Port           = "8000"
-	ExpirationTime = 6 * time.Hour
+	BindAddress = "127.0.0.1"
+	Port        = "8000"
 )
 
 // janitor is a background task that runs every 5 minutes to clean up old files
 func janitor() {
 	for {
-		time.Sleep(5 * time.Minute)
+		time.Sleep(10 * time.Second)
 		var podcast []orm.Podcast
 		if err := orm.GormDB.
+			Where("delete_at < ?", time.Now()).
 			Find(&podcast).
-			Where("updated_at < ?", time.Now().Add(-ExpirationTime)).
 			Error; err != nil {
 			log.Printf("failed to fetch podcasts: %v\n", err)
 			continue
 		}
-		log.Printf("cleaning up %d podcasts\n", len(podcast))
+		if len(podcast) == 0 {
+			continue
+		}
+		log.Printf("cleaning up %d file\n", len(podcast))
 		// no transaction because we don't rollback if something fails in the middle
 		// of the loop
 		for _, p := range podcast {
@@ -66,8 +68,9 @@ func init() {
 	if err != nil {
 		log.Printf("failed to parse EXPIRATION_TIME variable: %v\n", err)
 		log.Println("setting expiration time to 6 hours")
+		orm.ExpirationTime = 6 * time.Hour
 	} else {
-		ExpirationTime = time.Duration(timeInt) * time.Hour
+		orm.ExpirationTime = time.Duration(timeInt) * time.Second
 	}
 	timeInt, err = strconv.Atoi(os.Getenv("MAX_VIDEO_LENGTH"))
 	if err != nil {
