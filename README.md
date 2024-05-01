@@ -46,8 +46,8 @@ this thing was written in an hour, add whatever you want as long as it remains e
 # cool things
 
 1. it uses 64kbps vorbis audio which should be enough for multiple speakers + background music
-2. audio files are removed after 6 hours
-3. videos >4 hours are not allowed because i don't want to pay for storage (but you can change that the `.env` file)
+2. audio files are removed after 6 hours (this can be changed in the `.env` file)
+3. videos >4 hours are not allowed because i don't want to pay for storage (that can also be changed in the `.env` file)
 
 # collected data
 
@@ -62,6 +62,6 @@ here's all the things collected by the server:
 - [htmx](https://htmx.org/)
 - [hyperscript](https://hyperscript.org/)
 
-also it has a dark/light mode support and i think that's pretty cool
+also it has a dark/light mode support and i think that's pretty cool.
 
-oh and it should be accessible, but i'm not sure about if it's not please open an issue (or a pull request)
+oh and it should be accessible, but i'm not sure. if it's not please open an issue (or a pull request) and i'll fix it.
