@@ -1,0 +1,17 @@
+version: '3'
+services:
+  build:
+    container_name: podcastify
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # check the readme for more information on these variables
+      - PORT=8000
+      - BIND_ADDRESS=0.0.0.0
+      - MODE=production
+      - PODCAST_ROOT_PATH=.
+      - MAX_VIDEO_LENGTH=14400
+      - EXPIRATION_TIME=21600

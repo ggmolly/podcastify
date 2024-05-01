@@ -25,10 +25,18 @@ please wait a bit, i'm working on it; follow the instructions below to deploy yo
 > [!IMPORTANT]
 > i used go 1.22.2 to code that, but it should work with (a lot) of older versions
 
+## docker
+
+1. clone the repo
+2. edit the `.env.example` file or edit the `docker-compose.yml` file
+3. run `docker compose up --build -d`
+
+## manual
+
 1. clone this repository
 2. build using `go build`
 3. copy the `.env.example` file to `.env` and change the values to your liking
-4. run `podcastify` and you have your own
+4. run `podcastify` binary
 
 | variable | type | description |
 | --- | --- | --- |
