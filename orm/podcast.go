@@ -154,7 +154,7 @@ func (p *Podcast) Download() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if length > 10 {
+	if length > uint32(MaxLength.Seconds()) {
 		return "", fmt.Errorf("video is too long, max length is %s", MaxLength.String())
 	}
 	output := podcastPath(p)
