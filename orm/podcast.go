@@ -57,10 +57,18 @@ func PodcastFromRequest(c *fiber.Ctx) (*Podcast, error) {
 }
 
 // Returns the complete path of the podcast file based on the podcast struct
-func podcastPath(p *Podcast) string {
+func (p *Podcast) Path() string {
 	filename := p.Name()
 	completePath := filepath.Join(PATH, filename)
 	return completePath
+}
+
+// Returns whether the podcast file exists
+func (p *Podcast) Exists() bool {
+	if _, err := os.Stat(p.Path()); os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
 
 // Runs a bit of postprocessing on the podcast file
@@ -70,7 +78,7 @@ func (p *Podcast) Postprocess() error {
 	// Lock to avoid multiple ffmpeg processes running at the same time
 	ffmpegLock.Lock()
 	defer ffmpegLock.Unlock()
-	input := podcastPath(p)
+	input := p.Path()
 	input = input[:len(input)-3] + "m4a"
 	output := input[:len(input)-3] + "ogg"
 	cmd := exec.Command("ffmpeg", "-i", input, "-c:a", "libvorbis", "-b:a", "64k", output)
@@ -104,7 +112,7 @@ func (p *Podcast) BlacklistedCategories() string {
 
 // Removes the podcast file and the podcast from the database
 func (p *Podcast) Remove() {
-	if err := os.Remove(podcastPath(p)); err != nil {
+	if err := os.Remove(p.Path()); err != nil {
 		log.Println("failed to remove podcast file: ", err)
 	}
 	if err := GormDB.Delete(p).Error; err != nil {
@@ -157,7 +165,7 @@ func (p *Podcast) Download() (string, error) {
 	if length > uint32(MaxLength.Seconds()) {
 		return "", fmt.Errorf("video is too long, max length is %s", MaxLength.String())
 	}
-	output := podcastPath(p)
+	output := p.Path()
 	blacklisted := p.BlacklistedCategories()
 	args := []string{"-f", "140"}
 	if blacklisted != "" {

@@ -2,7 +2,6 @@ package routes
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/ggmolly/podcastify/orm"
 	"github.com/ggmolly/podcastify/shared"
@@ -18,12 +17,17 @@ func Podcastify(c *fiber.Ctx) error {
 		existingPodcast.Bump()
 		c.Response().Header.Set("HX-Redirect", fmt.Sprintf("/podcast/%s", podcast.Name()))
 	}
-	if _, err := podcast.Download(); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
-	if err := podcast.Postprocess(); err != nil {
-		log.Println(err)
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+
+	// If the podcast does not exist, download it
+	if !podcast.Exists() {
+		if _, err := podcast.Download(); err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+		if err := podcast.Postprocess(); err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+	} else {
+		podcast.Bump()
 	}
 	shared.UpdateStream(podcast.Name(), podcast)
 	c.Response().Header.Set("HX-Redirect", fmt.Sprintf("/podcast/%s", podcast.Name()))
