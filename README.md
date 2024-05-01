@@ -14,7 +14,7 @@ turn youtube videos into podcasts, removing the youtuber's bullshit and keeping 
 
 # demo
 
-a demo is available at [podcast.mana.rip](https://podcast.mana.rip), but it's not guaranteed to be up at all times.
+a demo is available at [podcastify.mana.rip](https://podcastify.mana.rip), but it's not guaranteed to be up at all times.
 
 # deploy your own
 
